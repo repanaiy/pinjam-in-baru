@@ -41,6 +41,14 @@ class SyncCatalogPhotos extends Command
             // Buang rujukan foto yang filenya tidak ada di disk.
             $item->photos()->get()->each(fn (ItemPhoto $p) => $disk->exists($p->path) ?: $p->delete());
 
+            // Foto sementara dari ItemPhotoSeeder (demo-N.jpg) diganti foto katalog asli.
+            $item->photos()->get()->each(function (ItemPhoto $p) use ($disk) {
+                if (preg_match('#/demo-\d+\.jpg$#', $p->path)) {
+                    $disk->delete($p->path);
+                    $p->delete();
+                }
+            });
+
             if ($item->photos()->exists()) {
                 continue;
             }
